@@ -371,3 +371,45 @@ export const BookDetails = () => {
 ```
 
 Este segundo enfoque es más simple y más correcto para datos síncronos: nada de useEffect, nada de estado, nada de re-render extra. useEffect solo aporta valor real cuando necesitas sincronizar con algo externo y asíncrono (una API, un timer, una suscripción) — que es justo el caso que viste en los ejemplos anteriores con Promise.
+
+
+```bash
+npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom
+```
+
+**Configura `vite.config.ts`:**
+```typescript
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.ts',
+  },
+});
+```
+
+**Crea `src/setupTests.ts`:**
+```typescript
+import '@testing-library/jest-dom';
+```
+
+**Actualiza `package.json`:**
+```json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
+  }
+}
+```
+
+```bash
+npm install -D @vitest/coverage-v8
+```
+
+tailwindcss.com/docs/installation/using-vite
