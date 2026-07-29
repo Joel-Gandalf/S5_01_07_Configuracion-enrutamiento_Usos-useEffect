@@ -1,0 +1,1 @@
+export const BookDetails = () => <h1>Detalls del Llibre</h1>

@@ -1,0 +1,1 @@
+export const BookList = () => <h1>Llistat de Llibres</h1>
