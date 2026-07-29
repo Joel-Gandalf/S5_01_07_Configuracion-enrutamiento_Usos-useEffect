@@ -1,0 +1,1 @@
+export const NotFound = () => <h1>404 - Pàgina no trobada</h1>

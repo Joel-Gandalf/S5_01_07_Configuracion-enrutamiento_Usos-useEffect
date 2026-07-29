@@ -1,0 +1,1 @@
+export const Home = () => <h1>Benvingut a la Biblioteca Digital</h1>
