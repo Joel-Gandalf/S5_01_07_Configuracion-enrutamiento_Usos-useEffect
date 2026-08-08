@@ -18,13 +18,32 @@ export const BookList = () => {
   // Mirar abajo ---1---
   const activeSearch = searchParams.get('search') || ''
   
+  // const handleSearch = (e: SubmitEvent) => {
+  //   e.preventDefault()
+  //   setSearchParams({ search: searchTerm })
+  // }
+
+  // Mirar abajo ---2---
   const handleSearch = (e: SubmitEvent) => {
     e.preventDefault()
-    setSearchParams({ search: searchTerm })
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev)
+      newParams.set('search', searchTerm)
+      return newParams
+    })
   }
   
+  // const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  //   setSearchParams({ category: e.target.value })
+  // }
+
+  // Mirar abajo ---2---
   const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setSearchParams({ category: e.target.value })
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev)
+      newParams.set('category', e.target.value)
+      return newParams
+    })
   }
   
   const filteredBooks = books.filter(book => {
@@ -120,3 +139,27 @@ export const BookList = () => {
 // searchTerm se queda solo para una cosa: que el usuario pueda escribir libremente en el input sin que cada tecla dispare un cambio de URL — pero una vez confirmada la búsqueda (submit), quien manda para el filtrado real pasa a ser la URL, no la memoria local.
 
 // Resumen corto: el cambio no aporta nada visible mientras usas la app normalmente clic a clic — aporta consistencia cuando la URL se recarga, se comparte, o se navega con atrás/adelante, que es precisamente el motivo de usar useSearchParams en vez de un simple useState para todo.
+
+
+// ---2---
+// handleSearch y handleCategoryChange ahora fusionan los parámetros existentes (new URLSearchParams(prev) + .set(...)) en vez de reemplazar todo el objeto, así category y search pueden coexistir en la URL a la vez.
+
+// setSearchParams({ category: 'Web' })
+
+// Esto no añade category a los parámetros existentes — reemplaza todos los query params por los que le pasas. Es decir, borra cualquier otro parámetro que hubiera antes.
+
+// Por eso:
+// Si primero buscas texto → setSearchParams({ search: 'react' }) → URL: /books?search=react.
+// Luego cambias la categoría → setSearchParams({ category: 'Web' }) → esto sustituye por completo los params anteriores → URL: /books?category=Web — el search=react desaparece de la URL.
+
+// ¿Cómo se arregla, para que ambos coexistan? Tienes que fusionar manualmente los parámetros existentes con el nuevo, en vez de reemplazar todo el objeto:
+
+  // setSearchParams(prev => {
+  //   const newParams = new URLSearchParams(prev)
+  //   newParams.set('search', searchTerm)
+  //   return newParams
+  // })
+
+// Aquí setSearchParams recibe una función en vez de un objeto — patrón parecido al updater function de useState (setState(prev => ...)). prev es el URLSearchParams actual; lo clonas con new URLSearchParams(prev), y sobre esa copia solo modificas la clave que te interesa con .set(...), dejando intactas las demás. Así, si ya había search=react y ahora cambias la categoría, el resultado sería /books?search=react&category=Web — ambos conviven.
+
+// Así que resumiendo: no, la URL no debería perder un parámetro al fijar otro
