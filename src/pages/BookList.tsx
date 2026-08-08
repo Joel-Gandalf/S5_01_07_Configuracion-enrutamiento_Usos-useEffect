@@ -15,6 +15,9 @@ export const BookList = () => {
   
   const categoryFilter = searchParams.get('category') || ''
   
+  // Mirar abajo ---1---
+  const activeSearch = searchParams.get('search') || ''
+  
   const handleSearch = (e: SubmitEvent) => {
     e.preventDefault()
     setSearchParams({ search: searchTerm })
@@ -25,9 +28,15 @@ export const BookList = () => {
   }
   
   const filteredBooks = books.filter(book => {
-    const matchesSearch = searchTerm 
-      ? book.title.toLowerCase().includes(searchTerm.toLowerCase())
+    // const matchesSearch = searchTerm 
+    //   ? book.title.toLowerCase().includes(searchTerm.toLowerCase())
+    //   : true
+
+    // Mirar abajo ---1---
+    const matchesSearch = activeSearch 
+      ? book.title.toLowerCase().includes(activeSearch.toLowerCase())
       : true
+
       
     const matchesCategory = categoryFilter
       ? book.category === categoryFilter
@@ -90,3 +99,24 @@ export const BookList = () => {
 //         </div>
 //     );
 // }
+
+
+// ---1---
+// El filtro usa searchTerm (el useState), no lo que hay realmente en la URL. Esto significa que el dato que se ve en pantalla (los libros filtrados) no depende de la URL, aunque la URL diga que sí debería. Son dos copias del mismo valor que, en este ejercicio concreto, casualmente siempre coinciden — pero no hay ninguna garantía real de que lo hagan siempre.
+
+// ¿Cuándo se nota el problema? Un caso muy concreto: si compartes o recargas la URL /books?search=react. Con el código original, al cargar la página de cero, searchTerm empieza vacío (useState('')), porque el useState no sabe leer la URL al iniciarse. El input se vería vacío y la lista NO estaría filtrada, aunque la URL diga claramente search=react. La URL "miente" — dice una cosa, pero la pantalla muestra otra.
+
+// const activeSearch = searchParams.get('search') || ''
+
+// const filteredBooks = books.filter(book => {
+//   const matchesSearch = activeSearch  // ← ahora sí depende de la URL real
+//     ? book.title.toLowerCase().includes(activeSearch.toLowerCase())
+//     : true
+//   ...
+// })
+
+// Ahora el filtrado siempre refleja lo que realmente hay en la URL, sin importar cómo se llegó a esa URL — ya sea escribiendo y dando submit, recargando la página, pegando un link compartido, o navegando con el botón "atrás" del navegador. La URL vuelve a ser la única fuente de verdad para lo que se muestra, que es justo la idea central de usar useSearchParams en primer lugar: que el estado de búsqueda viva en la URL (compartible, recargable, con historial), no solo en memoria.
+
+// searchTerm se queda solo para una cosa: que el usuario pueda escribir libremente en el input sin que cada tecla dispare un cambio de URL — pero una vez confirmada la búsqueda (submit), quien manda para el filtrado real pasa a ser la URL, no la memoria local.
+
+// Resumen corto: el cambio no aporta nada visible mientras usas la app normalmente clic a clic — aporta consistencia cuando la URL se recarga, se comparte, o se navega con atrás/adelante, que es precisamente el motivo de usar useSearchParams en vez de un simple useState para todo.
