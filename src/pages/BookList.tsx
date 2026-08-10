@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import type { SubmitEvent, ChangeEvent } from 'react'
 
@@ -12,12 +12,29 @@ const books = [
 export const BookList = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState('')
+  const [preferredCategory, setPreferredCategory] = useState<string>('')
   
   const categoryFilter = searchParams.get('category') || ''
   
   // Mirar abajo ---1---
   const activeSearch = searchParams.get('search') || ''
   
+  // Recuperar preferència de localStorage
+  useEffect(() => {
+    const savedCategory = localStorage.getItem('preferredCategory')
+    if (savedCategory) {
+      setPreferredCategory(savedCategory)
+    }
+  }, [])
+
+  // Guardar preferència a localStorage
+  useEffect(() => {
+    if (preferredCategory) {
+      localStorage.setItem('preferredCategory', preferredCategory)
+    }
+  }, [preferredCategory])
+  // Para que el localStorage funcione con el select de la página apliacar código de abajo --3--
+
   // const handleSearch = (e: SubmitEvent) => {
   //   e.preventDefault()
   //   setSearchParams({ search: searchTerm })
@@ -88,7 +105,19 @@ export const BookList = () => {
           <option value="Disseny">Disseny</option>
         </select>
       </div>
-      
+
+      <div>
+        <label>Categoria Preferida: </label>
+        <select
+          value={preferredCategory}
+          onChange={(e) => setPreferredCategory(e.target.value)}
+        >
+          <option value="">Cap</option>
+          <option value="Tecnologia">Tecnologia</option>
+          <option value="Programació">Programació</option>
+        </select>
+      </div>
+
       <ul>
         {filteredBooks.map(book => (
           <li key={book.id}>
@@ -163,3 +192,27 @@ export const BookList = () => {
 // Aquí setSearchParams recibe una función en vez de un objeto — patrón parecido al updater function de useState (setState(prev => ...)). prev es el URLSearchParams actual; lo clonas con new URLSearchParams(prev), y sobre esa copia solo modificas la clave que te interesa con .set(...), dejando intactas las demás. Así, si ya había search=react y ahora cambias la categoría, el resultado sería /books?search=react&category=Web — ambos conviven.
 
 // Así que resumiendo: no, la URL no debería perder un parámetro al fijar otro
+
+
+// --3--
+
+// APLICAR DENTRO DE const BookList = () => { ...
+
+// useEffect(() => {
+//   const savedCategory = localStorage.getItem('preferredCategory')
+//   if (savedCategory && !searchParams.get('category')) {
+//     setSearchParams(prev => {
+//       const newParams = new URLSearchParams(prev)
+//       newParams.set('category', savedCategory)
+//       return newParams
+//     })
+//   }
+// }, [])
+
+// useEffect(() => {
+//   if (categoryFilter) {
+//     localStorage.setItem('preferredCategory', categoryFilter)
+//   }
+// }, [categoryFilter])
+
+// && !searchParams.get('category') — esto es importante: si el usuario llega con una URL que ya trae un category explícito (por ejemplo, compartió un link con ?category=Web), no quieres pisarlo con la preferencia guardada. Solo aplicas la preferencia si la URL no especifica ninguna categoría todavía.
