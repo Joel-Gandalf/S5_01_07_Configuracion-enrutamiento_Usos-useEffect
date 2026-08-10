@@ -194,3 +194,25 @@ export const BookList = () => {
 // Así que resumiendo: no, la URL no debería perder un parámetro al fijar otro
 
 
+// --3--
+
+// APLICAR DENTRO DE const BookList = () => { ...
+
+// useEffect(() => {
+//   const savedCategory = localStorage.getItem('preferredCategory')
+//   if (savedCategory && !searchParams.get('category')) {
+//     setSearchParams(prev => {
+//       const newParams = new URLSearchParams(prev)
+//       newParams.set('category', savedCategory)
+//       return newParams
+//     })
+//   }
+// }, [])
+
+// useEffect(() => {
+//   if (categoryFilter) {
+//     localStorage.setItem('preferredCategory', categoryFilter)
+//   }
+// }, [categoryFilter])
+
+// && !searchParams.get('category') — esto es importante: si el usuario llega con una URL que ya trae un category explícito (por ejemplo, compartió un link con ?category=Web), no quieres pisarlo con la preferencia guardada. Solo aplicas la preferencia si la URL no especifica ninguna categoría todavía.
