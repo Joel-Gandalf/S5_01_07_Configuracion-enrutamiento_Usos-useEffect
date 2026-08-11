@@ -1,4 +1,5 @@
 import { Outlet, NavLink } from 'react-router'
+import { TabCounter } from './TabCounter'
 
 export const Layout = () => {
   const navStyle = ({ isActive }: { isActive: boolean }) => ({
@@ -15,6 +16,7 @@ export const Layout = () => {
       </header>
       
       <main>
+        <TabCounter />
         <Outlet />
       </main>
       
